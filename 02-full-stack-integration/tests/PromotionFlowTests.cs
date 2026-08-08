@@ -46,14 +46,14 @@ namespace EcommerceTests.Integration
         {
             
             var promo = await _apiClient.CreatePromotionAsync(new
-{
-    code          = "TESTDEAL25",
-    discountType  = "PERCENTAGE",
-    discountValue = 25,
-    category      = "ELECTRONICS",
-    validFrom     = DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-dd"),
-    validUntil    = DateTime.UtcNow.AddDays(30).ToString("yyyy-MM-dd")
-});
+         {
+             code          = "TESTDEAL25",
+             discountType  = "PERCENTAGE",
+             discountValue = 25,
+             category    = "ELECTRONICS",
+             validFrom     = DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-dd"),
+             validUntil    = DateTime.UtcNow.AddDays(30).ToString("yyyy-MM-dd")
+         });
             _testPromotionId = promo.PromotionId;
 
             Assert.That(promo.Code,          Is.EqualTo("TESTDEAL25"), "API: code mismatch");
@@ -63,13 +63,10 @@ namespace EcommerceTests.Integration
             
             var fetched = await _apiClient.GetPromotionAsync(_testPromotionId);
            
-
-            
             var checkoutPage = new CheckoutPage(Page);
             await checkoutPage.NavigateAsync();
             await checkoutPage.ApplyPromoCodeAsync("TESTDEAL25");
-
-           
+ 
             var originalPrice = await checkoutPage.GetOriginalPriceAsync();
             var discountAmt   = originalPrice * 0.25m;
             var finalPrice    = originalPrice - discountAmt;
@@ -115,14 +112,14 @@ namespace EcommerceTests.Integration
         {
             
             var promo = await _apiClient.CreatePromotionAsync(new
-{
-    code          = "EXPIREDCODE",
-    discountType  = "PERCENTAGE",
-    discountValue = 20,
-    category      = "ELECTRONICS",
-    validFrom     = DateTime.UtcNow.AddDays(-30).ToString("yyyy-MM-dd"),
-    validUntil    = DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-dd")
-});
+         {
+          code          = "EXPIREDCODE",
+          discountType  = "PERCENTAGE",
+          discountValue = 20,
+         category      = "ELECTRONICS",
+         validFrom     = DateTime.UtcNow.AddDays(-30).ToString("yyyy-MM-dd"),
+          validUntil    = DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-dd")
+         });
             _testPromotionId = promo.PromotionId;
 
             var checkoutPage = new CheckoutPage(Page);
@@ -146,15 +143,15 @@ namespace EcommerceTests.Integration
         public async Task TestWrongCategoryPromo()
         {
             
- var promo = await _apiClient.CreatePromotionAsync(new
-{
-    code          = "BOOKDEAL10",
-    discountType  = "PERCENTAGE",
-    discountValue = 10,
-    category      = "BOOKS",
-    validFrom     = DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-dd"),
-    validUntil    = DateTime.UtcNow.AddDays(30).ToString("yyyy-MM-dd")
-});
+          var promo = await _apiClient.CreatePromotionAsync(new
+         {
+          code          = "BOOKDEAL10",
+          discountType  = "PERCENTAGE",
+          discountValue = 10,
+          category      = "BOOKS",
+          validFrom     = DateTime.UtcNow.AddDays(-1).ToString("yyyy-MM-dd"),
+          validUntil    = DateTime.UtcNow.AddDays(30).ToString("yyyy-MM-dd")
+         });
             _testPromotionId = promo.PromotionId;
 
             var checkoutPage = new CheckoutPage(Page);

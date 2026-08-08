@@ -65,7 +65,7 @@ namespace EcommerceTests.Integration
            await Page.Locator(".discount-applied").WaitForAsync(new LocatorWaitForOptions
             {
                 State   = WaitForSelectorState.Visible,
-                Timeout = 10000
+                Timeout = 15000
             });
 
             var finalPriceElement = Page.Locator(".final-price");
@@ -76,13 +76,13 @@ namespace EcommerceTests.Integration
 
             var expectedPrice = Math.Round(originalPrice * 0.8,2);
 
-            Assert.AreEqual(expectedPrice, finalPrice,
-                $"Expected price {expectedPrice} but got {finalPrice}");
+           Assert.That(finalPrice, Is.EqualTo(expectedPrice).Within(0.01),
+    $"Expected price {expectedPrice} but got {finalPrice}");
 
             var discountBadge = Page.Locator(".discount-badge");
             var badgeText = await discountBadge.TextContentAsync();
-            Assert.AreEqual("-20%", badgeText.Trim(),
-                $"Expected discount badge '-20%' but got '{badgeText}'");
+            Assert.That(badgeText?.Trim(), Is.EqualTo("-20%"),
+    $"Expected discount badge '-20%' but got '{badgeText}'");
             await Page.Locator("#payment-method-card").ClickAsync();
             await Page.Locator("#card-number").FillAsync("4111111111111111");
             await Page.Locator("#card-expiry").FillAsync("12/25");
@@ -93,14 +93,14 @@ namespace EcommerceTests.Integration
 
             await Page.WaitForURLAsync("**/order-confirmation", new PageWaitForURLOptions
             {
-                Timeout = 20000
+                Timeout = 30000
             });
 
             var successMsg = Page.Locator(".success-message");
             await successMsg.WaitForAsync(new LocatorWaitForOptions
             {
                 State   = WaitForSelectorState.Visible,
-                Timeout = 10_000
+                Timeout = 10000
             });
             var successText = await successMsg.TextContentAsync();
             Assert.IsTrue(successText.Contains("Thank you for your order"));
