@@ -1,0 +1,103 @@
+================================================================================
+BUILD #1847 - FAILED
+Date: 2026-05-15 14:23:11 UTC
+Branch: feature/discount-optimization
+================================================================================
+
+Running: pytest tests/e2e/checkout.test.py::TestCheckout::test_checkout_process_with_discount
+
+[14:23:15] INFO: Starting Chrome headless
+[14:23:16] INFO: Navigating to https://staging.example-shop.com/products/laptop-pro
+[14:23:17] INFO: Clicking add-to-cart button
+[14:23:18] INFO: Waiting for cart count update
+[14:23:18] INFO: Cart count updated: 1 item
+[14:23:18] INFO: Navigating to cart page
+[14:23:19] INFO: Original price: 4999.0
+[14:23:19] INFO: Proceeding to checkout
+[14:23:20] INFO: Filling shipping details
+[14:23:21] INFO: Applying discount code: SAVE20
+[14:23:22] INFO: Waiting for discount confirmation
+[14:23:25] ERROR: Timeout waiting for element: .discount-applied
+[14:23:25] ERROR: Current URL: https://staging.example-shop.com/checkout
+[14:23:25] ERROR: Page source contains: <div class="discount-loading">Processing...</div>
+
+FAILED: selenium.common.exceptions.TimeoutException: Message:
+    Timed out waiting for element with class 'discount-applied'
+
+================================================================================
+BUILD #1851 - FAILED
+Date: 2026-05-15 16:45:33 UTC
+Branch: feature/discount-optimization
+================================================================================
+
+[16:45:38] INFO: Original price: 4999.0
+[16:45:39] INFO: Applying discount code: SAVE20
+[16:45:42] INFO: Discount applied successfully
+[16:45:42] INFO: Final price: 4000.0
+[16:45:42] ERROR: Assertion failed: Expected price 3999.2 but got 4000.0
+
+FAILED: AssertionError: Expected price 3999.2 but got 4000.0
+
+================================================================================
+BUILD #1856 - FAILED
+Date: 2026-05-16 09:12:44 UTC
+Branch: feature/discount-optimization
+================================================================================
+
+[09:12:49] INFO: Original price: 4999.0
+[09:12:51] INFO: Applying discount code: SAVE20
+[09:12:54] ERROR: Timeout waiting for element: .discount-applied
+[09:12:54] DEBUG: Network calls in progress:
+    - POST /api/v1/validate-discount-code [PENDING]
+    - GET /api/v1/pricing/calculate [PENDING]
+[09:12:54] ERROR: Screenshot saved: /tmp/failure-1856.png
+
+FAILED: selenium.common.exceptions.TimeoutException
+
+================================================================================
+BUILD #1862 - FAILED
+Date: 2026-05-17 11:30:21 UTC
+Branch: feature/discount-optimization
+================================================================================
+
+[11:30:26] INFO: Original price: 4999.0
+[11:30:28] INFO: Applying discount code: SAVE20
+[11:30:31] INFO: Discount applied successfully
+[11:30:31] INFO: Final price: 3999.0
+[11:30:31] INFO: Expected: 3999.2, Got: 3999.0
+[11:30:31] ERROR: Assertion failed: Expected price 3999.2 but got 3999.0
+
+FAILED: AssertionError: Expected price 3999.2 but got 3999.0
+
+================================================================================
+BUILD #1868 - FAILED
+Date: 2026-05-17 15:44:09 UTC
+Branch: feature/discount-optimization
+================================================================================
+
+[15:44:14] INFO: Original price: 4999.0
+[15:44:16] INFO: Applying discount code: SAVE20
+[15:44:19] ERROR: Timeout waiting for element: .discount-applied
+[15:44:19] DEBUG: API Response times:
+    - POST /api/v1/validate-discount-code: 2847ms (COMPLETED)
+    - POST /api/v1/pricing/calculate: 3421ms (TIMEOUT)
+[15:44:19] WARNING: External service 'pricing-service' response time > 3000ms
+
+FAILED: selenium.common.exceptions.TimeoutException
+
+================================================================================
+SUMMARY - Last 10 Builds
+================================================================================
+Build #1840: PASSED (12:20 UTC)
+Build #1843: PASSED (13:15 UTC)
+Build #1847: FAILED (14:23 UTC) - Timeout on discount-applied
+Build #1849: PASSED (15:10 UTC)
+Build #1851: FAILED (16:45 UTC) - Price assertion mismatch
+Build #1853: PASSED (08:30 UTC)
+Build #1856: FAILED (09:12 UTC) - Timeout on discount-applied
+Build #1859: PASSED (10:45 UTC)
+Build #1862: FAILED (11:30 UTC) - Price assertion mismatch
+Build #1868: FAILED (15:44 UTC) - Timeout on discount-applied
+
+Pass Rate: 50% (5/10)
+Average test duration: 14.3 seconds (passed tests: 11.2s, failed tests: 18.7s)

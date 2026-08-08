@@ -1,0 +1,60 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: test-db
+    environment:
+      POSTGRES_DB: testshop
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U testuser -d testshop"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # API Server (Node.js + Express + PostgreSQL)
+  api:
+    image: node:18-alpine
+    container_name: promotion-api
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./api:/app
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: testshop
+      DB_USER: testuser
+      DB_PASSWORD: testpass
+      PORT: 3000
+    command: >
+      sh -c "npm install && npm start"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:3000/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # Simple UI (Nginx serving static HTML)
+  web-ui:
+    image: nginx:alpine
+    container_name: test-ui
+    ports:
+      - "8080:80"
+    volumes:
+      - ./ui:/usr/share/nginx/html
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:

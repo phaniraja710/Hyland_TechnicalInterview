@@ -1,0 +1,100 @@
+[
+  {
+    "timestamp": "2026-05-17T15:44:14.123Z",
+    "method": "GET",
+    "url": "https://staging.example-shop.com/products/laptop-pro",
+    "status": 200,
+    "duration": 234,
+    "response_size": 45632
+  },
+  {
+    "timestamp": "2026-05-17T15:44:14.401Z",
+    "method": "POST",
+    "url": "https://staging.example-shop.com/api/v1/cart/add",
+    "status": 200,
+    "duration": 145,
+    "request_body": {
+      "productId": "laptop-pro-15",
+      "quantity": 1
+    },
+    "response_body": {
+      "cartId": "cart_abc123",
+      "itemCount": 1,
+      "total": 4999.0
+    }
+  },
+  {
+    "timestamp": "2026-05-17T15:44:18.234Z",
+    "method": "GET",
+    "url": "https://staging.example-shop.com/cart",
+    "status": 200,
+    "duration": 198,
+    "response_size": 23456
+  },
+  {
+    "timestamp": "2026-05-17T15:44:19.567Z",
+    "method": "POST",
+    "url": "https://staging.example-shop.com/api/v1/checkout/init",
+    "status": 200,
+    "duration": 312,
+    "response_body": {
+      "checkoutId": "chk_xyz789",
+      "subtotal": 4999.0,
+      "shipping": 0.0,
+      "total": 4999.0
+    }
+  },
+  {
+    "timestamp": "2026-05-17T15:44:21.789Z",
+    "method": "POST",
+    "url": "https://staging.example-shop.com/api/v1/discount/validate",
+    "status": 200,
+    "duration": 2847,
+    "request_body": {
+      "code": "SAVE20",
+      "checkoutId": "chk_xyz789"
+    },
+    "response_body": {
+      "valid": true,
+      "discountType": "PERCENTAGE",
+      "discountValue": 20,
+      "discountId": "disc_save20_2024"
+    }
+  },
+  {
+    "timestamp": "2026-05-17T15:44:21.812Z",
+    "method": "POST",
+    "url": "https://staging.example-shop.com/api/v1/pricing/calculate",
+    "status": null,
+    "duration": null,
+    "state": "PENDING",
+    "request_body": {
+      "checkoutId": "chk_xyz789",
+      "discountId": "disc_save20_2024",
+      "items": [
+        {
+          "productId": "laptop-pro-15",
+          "price": 4999.0,
+          "quantity": 1
+        }
+      ]
+    },
+    "error": "Request timeout after 3000ms",
+    "retries": 0,
+    "timeout_at": "2026-05-17T15:44:24.812Z"
+  },
+  {
+    "timestamp": "2026-05-17T15:44:24.823Z",
+    "method": "GET",
+    "url": "https://staging.example-shop.com/api/v1/health/pricing-service",
+    "status": 503,
+    "duration": 89,
+    "response_body": {
+      "status": "degraded",
+      "message": "High load detected",
+      "queueDepth": 234,
+      "avgResponseTime": 3200,
+      "recommendedAction": "retry_with_backoff"
+    }
+  }
+]

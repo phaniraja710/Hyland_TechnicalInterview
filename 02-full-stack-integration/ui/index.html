@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Shop - Checkout</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .price-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 4px;
+        }
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        .original-price {
+            color: #666;
+        }
+        .discount-amount {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .final-price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #27ae60;
+        }
+        .promo-section {
+            margin: 20px 0;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 200px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        #place-order {
+            background: #27ae60;
+            font-size: 16px;
+            padding: 15px 30px;
+            margin-top: 20px;
+        }
+        #place-order:hover {
+            background: #229954;
+        }
+        .success-message {
+            color: #27ae60;
+            padding: 10px;
+            margin: 10px 0;
+            background: #d4edda;
+            border-radius: 4px;
+        }
+        .error-message {
+            color: #e74c3c;
+            padding: 10px;
+            margin: 10px 0;
+            background: #f8d7da;
+            border-radius: 4px;
+        }
+        .hidden {
+            display: none;
+        }
+        .order-confirmation {
+            text-align: center;
+            padding: 40px;
+        }
+        .order-number {
+            font-size: 24px;
+            color: #27ae60;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="checkout-view">
+            <h1>Checkout</h1>
+
+            <div class="cart-item">
+                <div>
+                    <h3>Professional Laptop</h3>
+                    <p>Category: Electronics</p>
+                </div>
+                <div>
+                    <strong>$1,000.00</strong>
+                </div>
+            </div>
+
+            <div class="promo-section">
+                <h3>Have a discount code?</h3>
+                <input type="text" id="promo-code" placeholder="Enter code">
+                <button id="apply-promo">Apply</button>
+                <div id="promo-message" class="hidden"></div>
+            </div>
+
+            <div class="price-section">
+                <div class="price-row">
+                    <span>Original Price:</span>
+                    <span class="original-price">$1,000.00</span>
+                </div>
+                <div class="price-row discount-row hidden">
+                    <span>Discount:</span>
+                    <span class="discount-amount">$0.00</span>
+                </div>
+                <hr style="margin: 15px 0;">
+                <div class="price-row">
+                    <span>Final Price:</span>
+                    <span class="final-price">$1,000.00</span>
+                </div>
+            </div>
+
+            <button id="place-order">Place Order</button>
+        </div>
+
+        <div id="confirmation-view" class="hidden">
+            <div class="order-confirmation">
+                <h1>✓ Order Confirmed!</h1>
+                <p>Thank you for your purchase</p>
+                <div class="success-message">
+                    Your order has been successfully placed
+                </div>
+                <p>Order Number:</p>
+                <div class="order-number" id="order-number-display"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:3000';
+        const PRODUCT_ID = 'prod_laptop_001';
+
+        let originalPrice = 1000.00;
+        let discountAmount = 0.00;
+        let promotionCode = null;
+        let productCategory = 'ELECTRONICS';
+
+        // Validate promo code via API
+        async function validatePromoCode(code) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/promotions/code/${code}`);
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    return { valid: false, error: error.error };
+                }
+
+                const promo = await response.json();
+                return {
+                    valid: true,
+                    discountType: promo.discount_type,
+                    discountValue: promo.discount_value,
+                    category: promo.category
+                };
+            } catch (error) {
+                console.error('API Error:', error);
+                return { valid: false, error: 'Failed to validate promo code' };
+            }
+        }
+
+        document.getElementById('apply-promo').addEventListener('click', async function() {
+            const code = document.getElementById('promo-code').value.trim();
+            const messageDiv = document.getElementById('promo-message');
+
+            if (!code) {
+                messageDiv.textContent = 'Please enter a promo code';
+                messageDiv.className = 'error-message';
+                messageDiv.classList.remove('hidden');
+                return;
+            }
+
+            // Validate code
+            const result = await validatePromoCode(code);
+
+            if (result.valid && result.category === productCategory) {
+                // Calculate discount
+                if (result.discountType === 'PERCENTAGE') {
+                    discountAmount = (originalPrice * result.discountValue) / 100;
+                } else if (result.discountType === 'FIXED') {
+                    discountAmount = result.discountValue;
+                }
+
+                promotionCode = code;
+
+                // Update UI
+                document.querySelector('.discount-amount').textContent = `-$${discountAmount.toFixed(2)}`;
+                document.querySelector('.discount-row').classList.remove('hidden');
+                document.querySelector('.final-price').textContent = `$${(originalPrice - discountAmount).toFixed(2)}`;
+
+                messageDiv.textContent = `✓ Discount applied: ${result.discountValue}% off`;
+                messageDiv.className = 'success-message';
+                messageDiv.classList.remove('hidden');
+            } else if (result.valid && result.category !== productCategory) {
+                messageDiv.textContent = `This promo code is not valid for ${productCategory}`;
+                messageDiv.className = 'error-message';
+                messageDiv.classList.remove('hidden');
+            } else {
+                messageDiv.textContent = result.error || 'Invalid promo code';
+                messageDiv.className = 'error-message';
+                messageDiv.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('place-order').addEventListener('click', async function() {
+            try {
+                // Send order to backend API
+                const orderData = {
+                    customerEmail: 'test@example.com',
+                    productId: PRODUCT_ID,
+                    promotionCode: promotionCode
+                };
+
+                const response = await fetch(`${API_BASE_URL}/orders`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(orderData)
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    alert('Order failed: ' + error.error);
+                    return;
+                }
+
+                const result = await response.json();
+
+                // Show confirmation
+                document.getElementById('checkout-view').classList.add('hidden');
+                document.getElementById('confirmation-view').classList.remove('hidden');
+                document.getElementById('order-number-display').textContent = result.orderId;
+            } catch (error) {
+                console.error('Order error:', error);
+                alert('Failed to place order. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>
